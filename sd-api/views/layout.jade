@@ -1,0 +1,48 @@
+doctype html
+html
+    head
+      meta(charset='utf-8')
+      title Theme
+      meta(name='description', content='')
+      meta(name='viewport', content='width=device-width, initial-scale=1')
+      meta(name='mobile-web-app-capable', content='yes')
+      // build:css styles/vendor.css
+      // bower:css
+      link(rel='stylesheet', href='/semantic.min.css')
+      // endbower
+      // endbuild
+      link(href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300&subset=latin,vietnamese', rel='stylesheet', type='text/css')
+      // build:css styles/main.css
+      link(rel='stylesheet', href='main.css')
+      // endbuild
+      //- style(type='text/css').
+
+    body
+        nav.ui.fixed.menu.blue.inverted.navbar
+          a.brand.item(href='') Smart Dispatch
+          a.active.item
+            i.dashboard.icon
+            |  Dashboard
+          a.item
+            i.shop.icon
+            |  Purchase
+          a.item
+            i.settings.icon
+            |  Configure
+          .item.right
+            .ui.primary.button Sign up
+          .item.right
+            .ui.button Log-in
+
+        // end nav
+
+        block content
+
+        // build:js scripts/vendor.js
+        // bower:js
+        script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js')
+
+        script(src='/semantic.min.js')
+        script(src='main.js')
+        // endbower
+        // endbuild

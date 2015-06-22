@@ -1,0 +1,169 @@
+html
+    head
+        title
+        link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css", rel="stylesheet")
+        link(rel='stylesheet', href='/semantic.min.css')
+        // endbower
+        // endbuild
+        link(href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300&subset=latin,vietnamese', rel='stylesheet', type='text/css')
+        // build:css styles/main.css
+        link(rel='stylesheet', href='/main.css')
+        // endbuild
+        block style
+              style.
+                .chat-box {
+                  font:normal normal 11px/1.4 Tahoma,Verdana,Sans-Serif;
+                  color:#333;
+                  width:300px; /* Chatbox width */
+                  border:1px solid #eee;
+                  border-bottom:none;
+                  border-top-right-radius:4px;
+                  border-top-left-radius:4px;
+                  background-color: #79CDCD;
+                  position:fixed;
+                  right:10px;
+                  bottom:0;
+                  z-index:9999;
+                  -webkit-box-shadow:1px 1px 5px rgba(0,0,0,.2);
+                  -moz-box-shadow:1px 1px 5px rgba(0,0,0,.2);
+                  box-shadow:1px 1px 5px rgba(0,0,0,.2);
+                }
+                .chat-box > label{
+                color: #fff;
+                font-size: 2em;
+                font-weight: 100;
+                }
+                .chat-box > input[type="checkbox"] {
+                  display:block;
+                  margin:0 0;
+                  padding:0 0;
+                  position:absolute;
+                  top:0;
+                  right:0;
+                  left:0;
+                  width:100%;
+                  height:26px;
+                  z-index:4;
+                  cursor:pointer;
+                  background-color: #87CEEB !important;
+                  opacity:0;
+                  filter:alpha(opacity=0);
+                }
+
+
+                .chat-box > label:before {content:attr(data-collapsed)}
+
+                .chat-box .chat-box-content {
+                  padding:10px;
+                  display:none;
+                  background-color: #fff;
+                }
+
+                /* hover state */
+                .chat-box > input[type="checkbox"]:hover + label {}
+
+                /* checked state */
+                .chat-box > input[type="checkbox"]:checked + label {}
+                .chat-box > input[type="checkbox"]:checked + label:before {content:attr(data-expanded)}
+                .chat-box > input[type="checkbox"]:checked ~ .chat-box-content {display:block}
+
+        block script
+            script(src='//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+            script(src='https://webrtc.voxbone.com/js/voxbone-0.0.2.js', type='text/javascript')
+            script(src='https://webrtc.voxbone.com/js/jssip-0.3.0.js', type='text/javascript')
+            script(src='http://code.jquery.com/jquery-latest.min.js', type='text/javascript')
+            script(type='text/javascript').
+                function sendSMS(){
+
+                    var text = "Last call:\n #{userName} \n #{userPhone} \n #{userEmailAddress}\n #{userPos} @ #{userCo} \n #{userLoc} \n #{pageurl} ";
+                    var data;
+                    $.ajax({
+                      url: "https://rest.nexmo.com/sms/json?api_key=key&api_secret=secret&from=MyCompany20&to="+#{agentNum}+"&text="+text,
+                      type: 'GET',
+                      dataType: 'json',
+                      data: JSON.stringify(data),
+                      success: function(data) {
+                      console.log('success');
+                      },
+                      error: function() {
+                      console.log('failed');
+
+                      }
+                    });
+
+                };
+                  var eventHandlers = {
+                      'progress':   function(e){ document.getElementById("status_message").innerHTML="Calling" },
+                      'failed':     function(e){ document.getElementById("status_message").innerHTML="<b><font color='red'>Failed to connect: " + e.data.cause + "</font></b>"},
+                      'started':    function(e){ document.getElementById("status_message").innerHTML="<b><font color='green'>In Call</font></b>"; },
+                      'ended':      function(e){
+                        document.getElementById("status_message").innerHTML="<b><font color='red'>Call Ended</font></b>";
+                        sendSMS();
+                       }
+                  };
+                  function voxCall(voxrtc_config, userName, userPhone, agentDid, agentNum, userEmailAddress, userPos, userCo, userLoc, pageurl, agentEmailAddress){
+                    init(voxrtc_config, userName, userPhone, agentDid, agentNum, userEmailAddress, userPos, userCo, userLoc, pageurl, agentEmailAddress);
+                  };
+
+                  var callTimer;
+                  function init(voxrtc_config, userName, userPhone, agentDid, agentNum, userEmailAddress, userPos, userCo, userLoc, pageurl, agentEmailAddress){
+                    var context = {'clientName': userName, 'clientPhone': userPhone, 'agentNum': agentNum, 'userEmailAddress': userEmailAddress, 'userPos': userPos, 'userCo': userCo, 'userLoc': userLoc, 'pageurl': pageurl, 'agentEmailAddress': agentEmailAddress}
+                    voxbone.WebRTC.authServerURL = "https://webrtc.voxbone.com/rest/authentication/createToken";
+                    voxbone.WebRTC.customEventHandler = eventHandlers;
+                    voxbone.WebRTC.preferedPop = null;
+                    //- voxbone.WebRTC.useSecureSocket = true;
+                    voxbone.WebRTC.configuration.uri =  userPhone + "@voxbone.com";
+                    voxbone.WebRTC.configuration.display_name = userName;
+                    //- voxbone.WebRTC.videoComponentName = 'video';
+                    //- voxbone.WebRTC.allowVideo = true;
+                    voxbone.WebRTC.init(voxrtc_config);
+                    //- voxbone.WebRTC.context = context;
+                    voxbone.WebRTC.context = JSON.stringify(context);
+                    console.log(context);
+                    callTimer = window.setInterval(function(){makeCall(agentDid)},1000);
+                  };
+                  function makeCall(callDid){
+                      window.clearTimeout(callTimer);
+                      voxbone.WebRTC.call(callDid);
+                      window.onbeforeunload=function(e){
+                          voxbone.WebRTC.rtcSession.terminate();
+                      }
+                      hideNotif();
+                  };
+                  /** This part is required as it handle Voxbone WebRTC initialization **/
+                  /** Optional part, only use to play with mute **/
+                  function toggleMute(){
+                      var button = document.getElementById("mute");
+                      if( voxbone.WebRTC.isMuted ){
+                          voxbone.WebRTC.unmute();
+                          button.innerHTML = "Mute";
+                      }else{
+                          voxbone.WebRTC.mute();
+                          button.innerHTML = "Unmute";
+                      }
+                  }
+
+    block content
+
+      body(style='text-align: center;')
+        .chat-box
+                  input(type='checkbox')
+                  label(data-expanded='Close Callbox', data-collapsed='Call Us!')
+                  .chat-box-content
+                    a.btn.btn-block.btn-linkedin.btn-social(href='/auth/linkedin')
+                      i.fa.fa-linkedin
+                      | Sign in with LinkedIn
+
+                    button.btn.btn-success.btn-lg.btn-block(type='button', onclick='voxCall(#{voxrtc_config}, \'#{userName}\', \'#{userPhone}\', \'#{agentDid}\', \'#{agentNum}\', \'#{userEmailAddress}\', \'#{userPos}\', \'#{userCo}\', \'#{userLoc}\', \'#{pageurl}\', \'#{agentEmailAddress}\');') Dial
+                      span.glyphicon.glyphicon-earphone.pull-left
+                    button.btn.btn-danger.btn-lg.btn-block(type='button', onclick='voxbone.WebRTC.hangup();') Hangup
+                      span.glyphicon.glyphicon-remove.pull-left
+                    br
+                    #status_message
+                      p Initializing configuration
+
+    // build:js scripts/vendor.js
+    // bower:js
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js')
+    script(src='/semantic.min.js')
+    script(src='/main.js')

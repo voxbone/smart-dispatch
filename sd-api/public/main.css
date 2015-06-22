@@ -1,0 +1,9 @@
+.inline{
+    display: inline;
+}
+.small-input{
+    width: 180px !important;
+}
+.smaller-input{
+    width: 130px !important;
+}

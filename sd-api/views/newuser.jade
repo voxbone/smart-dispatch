@@ -1,0 +1,102 @@
+extends layout
+
+block content
+    .html.ui.top.attached.segment
+        br
+        h1 Manage your Agents
+
+        hr
+        table.ui.compact.celled.table
+            thead
+              tr
+                th First Name
+                th Last Name
+                th Email
+                th Phone
+                th DID
+                th Segment
+                th
+            tbody
+            each val, index in userlist
+                tr
+                    td= userlist[index].firstname
+                    td= userlist[index].lastname
+                    td= userlist[index].email
+                    td= userlist[index].number
+                    td= userlist[index].did
+                    td= userlist[index].segment
+                    td
+                        form#formRemoveUser.inline(name="removeuser",method="post",action="/removeuser")
+                            input(name="id", value=userlist[index]._id, type="hidden")
+                            button#btnSubmit(type="submit").ui.animated.fade.button
+                              i.visible.content.remove.icon
+                              .hidden.content
+                                |Delete?
+                        form#formEditUser.inline(name="edituser",method="post",action="/edituser")
+                            input(name="id", value=userlist[index]._id, type="hidden")
+                            button#btnSubmit(type="submit").ui.animated.fade.button
+                              i.visible.content.edit.icon
+                              .hidden.content
+                                |Edit?
+        form.ui.bottom.form#formAddUser(name="adduser",method="post",action="/adduser")
+            .six.fields
+                .field.fluid.smaller-input
+                  input#inputUserFirstName(type="text", placeholder="John", name="firstname")
+                .field.fluid.smaller-input
+                  input#inputUserLastName(type="text", placeholder="Doe", name="lastname")
+                .field.fluid
+                  input#inputUserEmail(type="text", placeholder="john@doe.com", name="email")
+                .field.fluid.small-input
+                  input#inputUserPhone(type="text", placeholder="+32475000000", name="number")
+                //- .field
+                //-   input#inputUserDid(type="text", placeholder="32475000000", name="did")
+                .field.fluid
+                    .ui.search.selection.dropdown.active.hidden.didsdropper(tabindex='0')
+                      .default.text Select DID
+                      i.dropdown.icon
+                      input#inputUserDid(name="did", type='hidden')
+                      .menu.transition.visible(tabindex='-1')
+                        each val, index in dids
+                          .item.didsdrop(data-value= dids[index])
+                             i= dids[index]
+
+                .field.fluid
+                    .ui.search.selection.dropdown.active.hidden.countriesdropper(tabindex='0')
+                      .default.text Select Country
+                      i.dropdown.icon
+                      input#inputSegment(name="segment", type='hidden')
+                      .menu.transition.visible(tabindex='-1')
+                        .item.countriesdrop(data-value='ad')
+                          i.ad.flag
+                          |Andorra
+                        .item.countriesdrop(data-value='ae')
+                          i.ae.flag
+                          |United Arab Emirates
+                        .item.countriesdrop(data-value='af')
+                          i.af.flag
+                          |Afghanistan
+                        .item.countriesdrop(data-value='ag')
+                          i.ag.flag
+                          |Antigua
+                        .item.countriesdrop(data-value='ai')
+                          i.ai.flag
+                          |Anguilla
+                        .item.countriesdrop(data-value='al')
+                          i.al.flag
+                          |Albania
+                        .item.countriesdrop(data-value='am')
+                          i.am.flag
+                          |Armenia
+                        .item.countriesdrop(data-value='an')
+                          i.an.flag
+                          |Netherlands Antilles
+                        .item.countriesdrop(data-value='be')
+                           i.be.flag
+                           |Belgium
+                        .item.countriesdrop(data-value='us')
+                           i.us.flag
+                           |United Stated
+                .field
+                  button.ui.left.floated.small.primary.labeled.icon.button#btnSubmit(type="submit")
+                    i.plus.icon
+                    |Add Agent
