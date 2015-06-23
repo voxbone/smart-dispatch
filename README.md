@@ -5,16 +5,16 @@ Smart Dispatch
 1. Download the repo
 2. Install the dependencies:
 
-cd sd-api
-npm install
-
-cd smart-dispatch
-npm instal
+  cd sd-api
+  npm install
+  
+  cd smart-dispatch
+  npm install
 
 3. Add your credentials
 
-In /smart-dispatch/configuration.js add your Voxbone WebRTC username/password
-In /smart-dispatch/index.js add your LinkedIn API and Secret keys
+  In /smart-dispatch/configuration.js add your Voxbone WebRTC username/password
+  In /smart-dispatch/index.js add your LinkedIn API and Secret keys
 
 4. Launch App:
 
